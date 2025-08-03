@@ -1,355 +1,350 @@
 <?php
 session_start();
-require_once 'php/db.php';
-require_once 'php/functions.php';
+require_once __DIR__ . '/php/db.php';
+require_once __DIR__ . '/php/functions.php';
 
-$page_title = 'متجر البلوطي - الصفحة الرئيسية';
+$page_title = 'الرئيسية - متجر البلوطي';
 $active = 'home';
 
+// الحصول على المنتجات المميزة
+$featured_products = getFeaturedProducts(6);
+$new_products = getNewProducts(8);
+$categories = getCategories();
+
 include 'includes/header.php';
+
+// إضافة رابط الإدارة للمديرين
+if (isset($_SESSION['admin_id'])) {
+    echo '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px; border-radius: 10px; margin: 20px 0; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+        <h3 style="color: white; margin: 0 0 10px 0; font-size: 18px;">🔧 لوحة الإدارة</h3>
+        <a href="admin_complete_fix.php" style="background: rgba(255,255,255,0.2); color: white; padding: 8px 20px; text-decoration: none; border-radius: 20px; border: 2px solid rgba(255,255,255,0.3); transition: all 0.3s ease; display: inline-block; font-size: 14px;">
+            🚀 الدخول للوحة الإدارة
+        </a>
+    </div>';
+}
 ?>
 
-<!-- إضافة ملف CSS الحديث -->
-<link rel="stylesheet" href="assets/css/modern-design.css">
-
-<main class="main-content">
-    <!-- قسم الترحيب -->
-    <section class="hero-section">
-        <div class="container">
-            <div class="hero-content">
+<!-- القسم الرئيسي -->
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
                 <h1 class="hero-title">مرحباً بك في متجر البلوطي</h1>
-                <p class="hero-subtitle">اكتشف تشكيلة واسعة من المنتجات المميزة بأفضل الأسعار</p>
-                <div class="hero-buttons">
-                    <a href="pages/products.php" class="btn btn-primary btn-lg">تصفح المنتجات</a>
-                    <a href="pages/about.php" class="btn btn-ghost btn-lg">تعرف علينا</a>
+                <p class="hero-description">اكتشف تشكيلة واسعة من المنتجات المميزة بأسعار منافسة وجودة عالية</p>
+                <div class="hero-actions">
+                    <a href="pages/products.php" class="btn cta-btn scale-hover">تصفح المنتجات</a>
+                    <a href="pages/offers.php" class="btn btn-outline scale-hover">العروض المميزة</a>
                 </div>
             </div>
             <div class="hero-image">
                 <img src="assets/images/hero-image.jpg" alt="متجر البلوطي" class="hero-img">
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- قسم الميزات -->
-    <section class="features-section">
-        <div class="container">
-            <h2 class="section-title">لماذا تختار متجر البلوطي؟</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-shipping-fast"></i>
-                    </div>
-                    <h3>توصيل سريع</h3>
-                    <p>احصل على طلباتك خلال 24 ساعة مع خدمة التوصيل المميزة</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h3>ضمان الجودة</h3>
-                    <p>جميع منتجاتنا مضمونة الجودة مع ضمان استرداد الأموال</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-headset"></i>
-                    </div>
-                    <h3>دعم 24/7</h3>
-                    <p>فريق دعم متاح على مدار الساعة لمساعدتك في أي وقت</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-tags"></i>
-                    </div>
-                    <h3>أسعار منافسة</h3>
-                    <p>أفضل الأسعار مع عروض وخصومات مستمرة</p>
-                </div>
+<!-- قسم المميزات -->
+<section class="features-section">
+    <div class="container">
+        <h2 class="section-title">لماذا تختار متجر البلوطي؟</h2>
+        <div class="features-grid">
+            <div class="feature-card card fade-in">
+                <div class="feature-icon">🚚</div>
+                <h3>شحن سريع</h3>
+                <p>نوفر خدمة شحن سريعة وآمنة لجميع أنحاء المملكة</p>
+            </div>
+            <div class="feature-card card fade-in">
+                <div class="feature-icon">🛡️</div>
+                <h3>ضمان الجودة</h3>
+                <p>جميع منتجاتنا مضمونة الجودة مع إمكانية الإرجاع</p>
+            </div>
+            <div class="feature-card card fade-in">
+                <div class="feature-icon">💰</div>
+                <h3>أسعار منافسة</h3>
+                <p>نوفر أفضل الأسعار مع عروض وخصومات مستمرة</p>
+            </div>
+            <div class="feature-card card fade-in">
+                <div class="feature-icon">📞</div>
+                <h3>دعم 24/7</h3>
+                <p>فريق دعم متاح على مدار الساعة لمساعدتك</p>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- قسم المنتجات المميزة -->
-    <section class="featured-products">
-        <div class="container">
-            <h2 class="section-title">المنتجات المميزة</h2>
-            <div class="products-grid">
-                <?php
-                try {
-                    $pdo = getConnection();
-                    $stmt = $pdo->prepare("
-                        SELECT p.*, c.name as category_name 
-                        FROM products p 
-                        LEFT JOIN categories c ON p.category_id = c.id 
-                        WHERE p.featured = 1 AND p.status = 'active' 
-                        ORDER BY p.created_at DESC 
-                        LIMIT 8
-                    ");
-                    $stmt->execute();
-                    $featured_products = $stmt->fetchAll();
-                    
-                    if (empty($featured_products)) {
-                        // إضافة منتجات تجريبية إذا لم تكن موجودة
-                        $sample_products = [
-                            ['name' => 'هاتف ذكي متطور', 'price' => 999.99, 'image' => 'phone.jpg'],
-                            ['name' => 'لابتوب للألعاب', 'price' => 1499.99, 'image' => 'laptop.jpg'],
-                            ['name' => 'سماعات لاسلكية', 'price' => 199.99, 'image' => 'headphones.jpg'],
-                            ['name' => 'ساعة ذكية', 'price' => 299.99, 'image' => 'smartwatch.jpg']
-                        ];
-                        
-                        foreach ($sample_products as $product) {
-                            echo '<div class="product-card">';
-                            echo '<div class="product-image">';
-                            echo '<img src="assets/images/products/' . $product['image'] . '" alt="' . $product['name'] . '">';
-                            echo '<div class="product-overlay">';
-                            echo '<a href="pages/product-details.php?id=1" class="btn btn-sm">عرض التفاصيل</a>';
-                            echo '<button class="btn btn-sm add-to-cart" data-product-id="1">إضافة للسلة</button>';
-                            if (isset($_SESSION['user_id'])) {
-                                echo '<button class="wishlist-btn" data-product-id="1"><i class="far fa-heart"></i></button>';
-                            }
-                            echo '</div>';
-                            echo '</div>';
-                            echo '<div class="product-info">';
-                            echo '<h3>' . htmlspecialchars($product['name']) . '</h3>';
-                            echo '<p class="product-price">$' . number_format($product['price'], 2) . '</p>';
-                            echo '</div>';
-                            echo '</div>';
-                        }
-                    } else {
-                        foreach ($featured_products as $product) {
-                            echo '<div class="product-card">';
-                            echo '<div class="product-image">';
-                            echo '<img src="assets/images/products/' . ($product['image'] ?: 'default.jpg') . '" alt="' . htmlspecialchars($product['name']) . '">';
-                            echo '<div class="product-overlay">';
-                            echo '<a href="pages/product-details.php?id=' . $product['id'] . '" class="btn btn-sm">عرض التفاصيل</a>';
-                            echo '<button class="btn btn-sm add-to-cart" data-product-id="' . $product['id'] . '">إضافة للسلة</button>';
-                            if (isset($_SESSION['user_id'])) {
-                                echo '<button class="wishlist-btn" data-product-id="' . $product['id'] . '"><i class="far fa-heart"></i></button>';
-                            }
-                            echo '</div>';
-                            echo '</div>';
-                            echo '<div class="product-info">';
-                            echo '<h3>' . htmlspecialchars($product['name']) . '</h3>';
-                            echo '<p class="product-price">$' . number_format($product['price'], 2) . '</p>';
-                            echo '</div>';
-                            echo '</div>';
-                        }
-                    }
-                } catch (Exception $e) {
-                    echo '<p class="text-center">عذراً، حدث خطأ في تحميل المنتجات</p>';
-                }
-                ?>
+<!-- قسم الفئات -->
+<section class="categories-section">
+    <div class="container">
+        <h2 class="section-title">تصفح حسب الفئة</h2>
+        <div class="categories-grid">
+            <?php foreach ($categories as $category): ?>
+            <div class="category-card card fade-in">
+                <div class="category-icon">📦</div>
+                <h3><?= htmlspecialchars($category['name']) ?></h3>
+                <p><?= htmlspecialchars($category['description'] ?? '') ?></p>
+                <a href="pages/products.php?category=<?= $category['id'] ?>" class="category-link">تصفح الفئة</a>
             </div>
-            <div class="text-center mt-4">
-                <a href="pages/products.php" class="btn btn-primary">عرض جميع المنتجات</a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+
+<!-- قسم المنتجات المميزة -->
+<section class="featured-products-section">
+    <div class="container">
+        <h2 class="section-title">المنتجات المميزة</h2>
+        <div class="products-grid">
+            <?php foreach ($featured_products as $product): ?>
+            <div class="product-card card fade-in">
+                <div class="product-image">
+                    <img src="<?= htmlspecialchars($product['image'] ? 'assets/images/products/' . $product['image'] : 'assets/images/placeholder.png') ?>" 
+                         alt="<?= htmlspecialchars($product['name']) ?>" class="product-img">
+                    <div class="product-overlay">
+                        <a href="pages/product.php?id=<?= $product['id'] ?>" class="btn btn-sm">عرض التفاصيل</a>
+                        <button class="btn btn-sm add-to-cart" data-product-id="<?= $product['id'] ?>">إضافة للسلة</button>
+                        <?php if (isset($_SESSION['user_id'])): ?>
+                        <button class="wishlist-btn" data-product-id="<?= $product['id'] ?>">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title"><?= htmlspecialchars($product['name']) ?></h3>
+                    <p class="product-price"><?= formatPrice($product['price']) ?></p>
+                    <div class="product-rating">
+                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <i class="fas fa-star <?= $i <= ($product['rating'] ?? 0) ? 'filled' : '' ?>"></i>
+                        <?php endfor; ?>
+                        <span class="rating-count">(<?= $product['review_count'] ?? 0 ?>)</span>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <div class="section-actions">
+            <a href="pages/products.php" class="btn btn-outline">عرض جميع المنتجات</a>
+        </div>
+    </div>
+</section>
+
+<!-- قسم المنتجات الجديدة -->
+<section class="new-products-section">
+    <div class="container">
+        <h2 class="section-title">أحدث المنتجات</h2>
+        <div class="products-grid">
+            <?php foreach ($new_products as $product): ?>
+            <div class="product-card card fade-in">
+                <div class="product-image">
+                    <img src="<?= htmlspecialchars($product['image'] ? 'assets/images/products/' . $product['image'] : 'assets/images/placeholder.png') ?>" 
+                         alt="<?= htmlspecialchars($product['name']) ?>" class="product-img">
+                    <div class="product-overlay">
+                        <a href="pages/product.php?id=<?= $product['id'] ?>" class="btn btn-sm">عرض التفاصيل</a>
+                        <button class="btn btn-sm add-to-cart" data-product-id="<?= $product['id'] ?>">إضافة للسلة</button>
+                        <?php if (isset($_SESSION['user_id'])): ?>
+                        <button class="wishlist-btn" data-product-id="<?= $product['id'] ?>">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title"><?= htmlspecialchars($product['name']) ?></h3>
+                    <p class="product-price"><?= formatPrice($product['price']) ?></p>
+                    <div class="product-rating">
+                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <i class="fas fa-star <?= $i <= ($product['rating'] ?? 0) ? 'filled' : '' ?>"></i>
+                        <?php endfor; ?>
+                        <span class="rating-count">(<?= $product['review_count'] ?? 0 ?>)</span>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+
+<!-- قسم الإحصائيات -->
+<section class="stats-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">1000+</div>
+                <div class="stat-label">منتج متنوع</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">5000+</div>
+                <div class="stat-label">عميل راضي</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">دعم متواصل</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">ضمان الجودة</div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- قسم الفئات -->
-    <section class="categories-section">
-        <div class="container">
-            <h2 class="section-title">تصفح حسب الفئة</h2>
-            <div class="categories-grid">
-                <?php
-                try {
-                    $stmt = $pdo->prepare("SELECT * FROM categories WHERE status = 'active' ORDER BY name LIMIT 6");
-                    $stmt->execute();
-                    $categories = $stmt->fetchAll();
-                    
-                    if (empty($categories)) {
-                        $sample_categories = [
-                            ['name' => 'الإلكترونيات', 'description' => 'أحدث الأجهزة الإلكترونية'],
-                            ['name' => 'الملابس', 'description' => 'أزياء عصرية وأنيقة'],
-                            ['name' => 'المنزل', 'description' => 'مستلزمات المنزل والديكور'],
-                            ['name' => 'الرياضة', 'description' => 'معدات رياضية وملابس رياضية'],
-                            ['name' => 'الكتب', 'description' => 'كتب متنوعة في جميع المجالات'],
-                            ['name' => 'الألعاب', 'description' => 'ألعاب للأطفال والكبار']
-                        ];
-                        
-                        foreach ($sample_categories as $category) {
-                            echo '<div class="category-card">';
-                            echo '<div class="category-icon"><i class="fas fa-box"></i></div>';
-                            echo '<h3>' . htmlspecialchars($category['name']) . '</h3>';
-                            echo '<p>' . htmlspecialchars($category['description']) . '</p>';
-                            echo '<a href="pages/products.php?category=1" class="category-link">تصفح الفئة</a>';
-                            echo '</div>';
-                        }
-                    } else {
-                        foreach ($categories as $category) {
-                            echo '<div class="category-card">';
-                            echo '<div class="category-icon"><i class="fas fa-box"></i></div>';
-                            echo '<h3>' . htmlspecialchars($category['name']) . '</h3>';
-                            echo '<p>' . htmlspecialchars($category['description'] ?: 'تصفح منتجات هذه الفئة') . '</p>';
-                            echo '<a href="pages/products.php?category=' . $category['id'] . '" class="category-link">تصفح الفئة</a>';
-                            echo '</div>';
-                        }
-                    }
-                } catch (Exception $e) {
-                    echo '<p class="text-center">عذراً، حدث خطأ في تحميل الفئات</p>';
-                }
-                ?>
-            </div>
+<!-- قسم النشرة البريدية -->
+<section class="newsletter-section">
+    <div class="container">
+        <div class="newsletter-content">
+            <h2>اشترك في النشرة البريدية</h2>
+            <p>احصل على آخر العروض والتحديثات مباشرة في بريدك الإلكتروني</p>
+            <form class="newsletter-form" id="newsletterForm">
+                <input type="email" placeholder="أدخل بريدك الإلكتروني" required>
+                <button type="submit" class="btn">اشتراك</button>
+            </form>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- قسم الإحصائيات -->
-    <section class="stats-section">
-        <div class="container">
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-number">1000+</div>
-                    <div class="stat-label">منتج متنوع</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">5000+</div>
-                    <div class="stat-label">عميل راضي</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">50+</div>
-                    <div class="stat-label">فئة منتجات</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">24/7</div>
-                    <div class="stat-label">دعم فني</div>
-                </div>
-            </div>
-        </div>
-    </section>
-</main>
+<?php include 'includes/footer.php'; ?>
 
-<!-- CSS إضافي للصفحة الرئيسية -->
 <style>
-/* Hero Section */
+/* تصميم الصفحة الرئيسية */
 .hero-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #00897b 0%, #00acc1 100%);
     color: white;
-    padding: 80px 0;
-    position: relative;
-    overflow: hidden;
-}
-
-.hero-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('assets/images/pattern.svg') repeat;
-    opacity: 0.1;
+    padding: 4rem 0;
+    margin-top: 80px;
 }
 
 .hero-content {
-    text-align: center;
-    max-width: 600px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
 }
 
 .hero-title {
     font-size: 3rem;
     font-weight: 800;
     margin-bottom: 1rem;
-    animation: fadeInUp 1s ease;
+    line-height: 1.2;
 }
 
-.hero-subtitle {
+.hero-description {
     font-size: 1.2rem;
     margin-bottom: 2rem;
     opacity: 0.9;
-    animation: fadeInUp 1s ease 0.2s both;
 }
 
-.hero-buttons {
+.hero-actions {
     display: flex;
     gap: 1rem;
-    justify-content: center;
     flex-wrap: wrap;
-    animation: fadeInUp 1s ease 0.4s both;
 }
 
-/* Features Section */
-.features-section {
-    padding: 80px 0;
-    background: #f8f9fa;
+.btn-outline {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
 }
 
-.section-title {
+.btn-outline:hover {
+    background: white;
+    color: #00897b;
+}
+
+.hero-image {
     text-align: center;
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 3rem;
-    color: #333;
+}
+
+.hero-img {
+    max-width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.features-section {
+    padding: 4rem 0;
+    background: #f8f9fa;
 }
 
 .features-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 2rem;
+    margin-top: 3rem;
 }
 
 .feature-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 15px;
     text-align: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
-}
-
-.feature-card:hover {
-    transform: translateY(-5px);
+    padding: 2rem;
 }
 
 .feature-icon {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1rem;
-}
-
-.feature-icon i {
-    font-size: 2rem;
-    color: white;
+    font-size: 3rem;
+    margin-bottom: 1rem;
 }
 
 .feature-card h3 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
+    font-weight: 600;
     margin-bottom: 1rem;
     color: #333;
 }
 
-.feature-card p {
-    color: #666;
-    line-height: 1.6;
+.categories-section {
+    padding: 4rem 0;
 }
 
-/* Featured Products */
-.featured-products {
-    padding: 80px 0;
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+}
+
+.category-card {
+    text-align: center;
+    padding: 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    background: #00897b;
+    color: white;
+}
+
+.category-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.category-link {
+    color: inherit;
+    text-decoration: none;
+    font-weight: 600;
+    margin-top: 1rem;
+    display: inline-block;
+}
+
+.featured-products-section,
+.new-products-section {
+    padding: 4rem 0;
+}
+
+.featured-products-section {
+    background: #f8f9fa;
 }
 
 .products-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2rem;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
 }
 
 .product-card {
-    background: white;
-    border-radius: 15px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
-}
-
-.product-card:hover {
-    transform: translateY(-5px);
+    position: relative;
 }
 
 .product-image {
@@ -362,19 +357,23 @@ include 'includes/header.php';
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image img {
+    transform: scale(1.05);
 }
 
 .product-overlay {
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.7);
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    align-items: center;
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -383,148 +382,69 @@ include 'includes/header.php';
     opacity: 1;
 }
 
-.product-info {
-    padding: 1.5rem;
+.product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-.product-info h3 {
-    font-size: 1.2rem;
+.product-info {
+    padding: 1.5rem;
+    background: #fff;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-info {
+    transform: translateY(0);
+}
+
+.product-title {
+    font-size: 1.1rem;
+    font-weight: 700;
     margin-bottom: 0.5rem;
     color: #333;
 }
 
 .product-price {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: #667eea;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #00897b;
+    margin-bottom: 0.5rem;
 }
 
-/* Categories Section */
-.categories-section {
-    padding: 80px 0;
-    background: #f8f9fa;
-}
-
-.categories-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-}
-
-.category-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 15px;
-    text-align: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
-}
-
-.category-card:hover {
-    transform: translateY(-5px);
-}
-
-.category-icon {
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border-radius: 50%;
+.product-rating {
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin: 0 auto 1rem;
+    color: #ffd700; /* Gold color for stars */
 }
 
-.category-icon i {
-    font-size: 1.5rem;
-    color: white;
-}
-
-.category-card h3 {
-    font-size: 1.3rem;
-    margin-bottom: 0.5rem;
-    color: #333;
-}
-
-.category-card p {
+.rating-count {
+    font-size: 0.8rem;
+    margin-left: 5px;
     color: #666;
-    margin-bottom: 1rem;
 }
 
-.category-link {
-    color: #667eea;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.category-link:hover {
-    text-decoration: underline;
-}
-
-/* Stats Section */
-.stats-section {
-    padding: 60px 0;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+.add-to-cart {
+    background: #00897b;
     color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
 }
 
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 2rem;
-    text-align: center;
+.add-to-cart:hover {
+    background: #00796b;
 }
 
-.stat-number {
-    font-size: 3rem;
-    font-weight: 800;
-    margin-bottom: 0.5rem;
-}
-
-.stat-label {
-    font-size: 1.1rem;
-    opacity: 0.9;
-}
-
-/* Animations */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .hero-title {
-        font-size: 2rem;
-    }
-    
-    .hero-buttons {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .section-title {
-        font-size: 2rem;
-    }
-    
-    .features-grid,
-    .products-grid,
-    .categories-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-/* Wishlist Button */
 .wishlist-btn {
     background: rgba(255,255,255,0.9);
     color: #666;
@@ -550,6 +470,119 @@ include 'includes/header.php';
 .wishlist-btn.in-wishlist i {
     color: white;
 }
-</style>
 
-<?php include 'includes/footer.php'; ?> 
+.stats-section {
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.newsletter-section {
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #00897b, #00acc1);
+    color: white;
+    text-align: center;
+}
+
+.newsletter-content h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.newsletter-content p {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.newsletter-form {
+    display: flex;
+    gap: 1rem;
+    max-width: 500px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+}
+
+.newsletter-form input {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    min-width: 200px;
+}
+
+.newsletter-form button {
+    padding: 1rem 2rem;
+    background: #ffd600;
+    color: #333;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.newsletter-form button:hover {
+    background: #ffed4e;
+    transform: translateY(-2px);
+}
+
+/* الاستجابة للشاشات الصغيرة */
+@media (max-width: 768px) {
+    .hero-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 2rem;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-actions {
+        justify-content: center;
+    }
+    
+    .features-grid,
+    .categories-grid,
+    .products-grid,
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .newsletter-form {
+        flex-direction: column;
+    }
+    
+    .newsletter-form input,
+    .newsletter-form button {
+        width: 100%;
+    }
+}
+</style>
