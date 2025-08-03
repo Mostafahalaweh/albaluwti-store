@@ -1,0 +1,382 @@
+# Security Patches for Albaluwti E-commerce Store
+# These patches require manual review and approval before application
+
+## Patch 1: Standardize Database Connections to PDO
+
+--- admin/login.php
++++ admin/login.php
+@@ -25,20 +25,20 @@
+     } else {
+         // التحقق من الاتصال بقاعدة البيانات
+-        if (!$conn) {
++        if (!$pdo) {
+             $message = 'خطأ في الاتصال بقاعدة البيانات. يرجى التحقق من إعدادات قاعدة البيانات.';
+             $message_type = 'error';
+         } else {
+-            $stmt = $conn->prepare('SELECT id, username, password, full_name, role FROM users WHERE username = ? AND role = "admin" AND status = "active"');
++            $stmt = $pdo->prepare('SELECT id, username, password, full_name, role FROM users WHERE username = ? AND role = "admin" AND status = "active"');
+             
+             if (!$stmt) {
+-                $message = 'خطأ في إعداد الاستعلام: ' . $conn->error;
++                $message = 'خطأ في إعداد الاستعلام: ' . $pdo->errorInfo()[2];
+                 $message_type = 'error';
+             } else {
+-                $stmt->bind_param('s', $username);
+-                $stmt->execute();
+-                $user = $stmt->get_result()->fetch_assoc();
+-                $stmt->close();
++                $stmt->execute([$username]);
++                $user = $stmt->fetch(PDO::FETCH_ASSOC);
++                $stmt = null;
+                 
+                 if ($user && password_verify($password, $user['password'])) {
+                     $_SESSION['admin_id'] = $user['id'];
+@@ -48,12 +48,12 @@
+                     
+                     // تسجيل نشاط تسجيل الدخول
+-                    $stmt = $conn->prepare('INSERT INTO activity_log (user_id, action, description, ip_address) VALUES (?, ?, ?, ?)');
++                    $stmt = $pdo->prepare('INSERT INTO activity_log (user_id, action, description, ip_address) VALUES (?, ?, ?, ?)');
+                     if ($stmt) {
+                         $action = 'admin_login';
+                         $description = 'تسجيل دخول الإدارة';
+                         $ip = $_SERVER['REMOTE_ADDR'];
+-                        $stmt->bind_param('isss', $user['id'], $action, $description, $ip);
+-                        $stmt->execute();
+-                        $stmt->close();
++                        $stmt->execute([$user['id'], $action, $description, $ip]);
++                        $stmt = null;
+                     }
+
+## Patch 2: Fix Directory Traversal Vulnerabilities
+
+--- admin/settings.php
++++ admin/settings.php
+@@ -35,8 +35,9 @@
+     $logo_name = time() . '_' . basename($_FILES['site_logo']['name']);
+     
+     // إنشاء المجلد إذا لم يكن موجوداً
+-    if (!is_dir('../assets/images')) mkdir('../assets/images', 0777, true);
++    $upload_dir = realpath('../assets/images/');
++    if (!$upload_dir || !is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+     
+-    if (move_uploaded_file($_FILES['site_logo']['tmp_name'], '../assets/images/' . $logo_name)) {
++    if (move_uploaded_file($_FILES['site_logo']['tmp_name'], $upload_dir . DIRECTORY_SEPARATOR . basename($logo_name))) {
+         $current_settings['site_logo'] = $logo_name;
+         $message = 'تم تحديث الشعار بنجاح';
+         $message_type = 'success';
+@@ -48,8 +49,9 @@
+     $banner_name = time() . '_' . basename($_FILES['site_banner']['name']);
+     
+     // إنشاء المجلد إذا لم يكن موجوداً
+-    if (!is_dir('../assets/images')) mkdir('../assets/images', 0777, true);
++    $upload_dir = realpath('../assets/images/');
++    if (!$upload_dir || !is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+     
+-    if (move_uploaded_file($_FILES['site_banner']['tmp_name'], '../assets/images/' . $banner_name)) {
++    if (move_uploaded_file($_FILES['site_banner']['tmp_name'], $upload_dir . DIRECTORY_SEPARATOR . basename($banner_name))) {
+         $current_settings['site_banner'] = $banner_name;
+         $message = 'تم تحديث البنر بنجاح';
+         $message_type = 'success';
+
+--- admin/products.php
++++ admin/products.php
+@@ -46,8 +46,9 @@
+         $image_name = time() . '_' . basename($_FILES['image']['name']);
+         
+         // إنشاء المجلد إذا لم يكن موجوداً
+-        if (!is_dir('../assets/images/products')) mkdir('../assets/images/products', 0777, true);
++        $upload_dir = realpath('../assets/images/products/');
++        if (!$upload_dir || !is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+         
+-        move_uploaded_file($_FILES['image']['tmp_name'], '../assets/images/products/' . $image_name);
++        move_uploaded_file($_FILES['image']['tmp_name'], $upload_dir . DIRECTORY_SEPARATOR . basename($image_name));
+         
+         $stmt = $pdo->prepare("INSERT INTO products (name, description, price, category_id, image, stock_quantity) VALUES (?, ?, ?, ?, ?, ?)");
+
+## Patch 3: Enhanced Input Validation
+
+--- pages/contact.php
++++ pages/contact.php
+@@ -100,6 +100,15 @@
+                     <label for="message" class="form-label">الرسالة</label>
+                     <textarea name="message" rows="5" placeholder="اكتب رسالتك هنا..." required><?= htmlspecialchars($_POST['message'] ?? '') ?></textarea>
+                 </div>
++                
++                <!-- CSRF Protection -->
++                <input type="hidden" name="csrf_token" value="<?= generateCSRFToken() ?>">
++                
++                <!-- Input validation -->
++                <script>
++                document.getElementById('contactForm').addEventListener('submit', function(e) {
++                    var message = document.querySelector('textarea[name="message"]').value;
++                    if (message.length < 10) {
++                        e.preventDefault();
++                        alert('يجب أن تكون الرسالة 10 أحرف على الأقل');
++                    }
++                });
++                </script>
+
+--- admin/add_product.php
++++ admin/add_product.php
+@@ -190,6 +190,15 @@
+                 <div class="form-group">
+                     <label for="name">اسم المنتج</label>
+                     <input type="text" name="name" value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>" required>
++                    <div class="validation-error" id="nameError" style="display: none; color: red; font-size: 0.9em;"></div>
++                </div>
++                
++                <div class="form-group">
++                    <label for="description">وصف المنتج</label>
++                    <textarea name="description" rows="4" required><?php echo htmlspecialchars($_POST['description'] ?? ''); ?></textarea>
++                    <div class="validation-error" id="descError" style="display: none; color: red; font-size: 0.9em;"></div>
++                </div>
++                
++                <div class="form-group">
++                    <label for="price">السعر</label>
++                    <input type="number" name="price" step="0.01" value="<?php echo htmlspecialchars($_POST['price'] ?? ''); ?>" required>
++                    <div class="validation-error" id="priceError" style="display: none; color: red; font-size: 0.9em;"></div>
+                 </div>
+-                
+-                <div class="form-group">
+-                    <label for="description">وصف المنتج</label>
+-                    <textarea name="description" rows="4" required><?php echo htmlspecialchars($_POST['description'] ?? ''); ?></textarea>
+-                </div>
+-                
+-                <div class="form-group">
+-                    <label for="price">السعر</label>
+-                    <input type="number" name="price" step="0.01" value="<?php echo htmlspecialchars($_POST['price'] ?? ''); ?>" required>
+-                </div>
++                
++                <!-- CSRF Protection -->
++                <input type="hidden" name="csrf_token" value="<?= generateCSRFToken() ?>">
++                
++                <!-- Enhanced validation script -->
++                <script>
++                document.getElementById('addProductForm').addEventListener('submit', function(e) {
++                    var name = document.querySelector('input[name="name"]').value.trim();
++                    var description = document.querySelector('textarea[name="description"]').value.trim();
++                    var price = document.querySelector('input[name="price"]').value;
++                    
++                    var isValid = true;
++                    
++                    if (name.length < 3) {
++                        document.getElementById('nameError').textContent = 'اسم المنتج يجب أن يكون 3 أحرف على الأقل';
++                        document.getElementById('nameError').style.display = 'block';
++                        isValid = false;
++                    } else {
++                        document.getElementById('nameError').style.display = 'none';
++                    }
++                    
++                    if (description.length < 10) {
++                        document.getElementById('descError').textContent = 'وصف المنتج يجب أن يكون 10 أحرف على الأقل';
++                        document.getElementById('descError').style.display = 'block';
++                        isValid = false;
++                    } else {
++                        document.getElementById('descError').style.display = 'none';
++                    }
++                    
++                    if (price <= 0) {
++                        document.getElementById('priceError').textContent = 'السعر يجب أن يكون أكبر من صفر';
++                        document.getElementById('priceError').style.display = 'block';
++                        isValid = false;
++                    } else {
++                        document.getElementById('priceError').style.display = 'none';
++                    }
++                    
++                    if (!isValid) {
++                        e.preventDefault();
++                    }
++                });
++                </script>
+
+## Patch 4: Fix Accessibility Issues
+
+--- index.php
++++ index.php
+@@ -119,7 +119,7 @@
+                     echo '<div class="product-card">';
+                     echo '<div class="product-image">';
+                     echo '<img src="assets/images/products/' . ($product['image'] ?: 'default.jpg') . '" 
+-                          alt="' . htmlspecialchars($product['name']) . '">';
++                          alt="' . htmlspecialchars($product['name']) . '" loading="lazy">';
+                     echo '</div>';
+                     echo '<div class="product-info">';
+                     echo '<h3>' . htmlspecialchars($product['name']) . '</h3>';
+@@ -129,7 +129,7 @@
+                     echo '<div class="product-card">';
+                     echo '<div class="product-image">';
+                     echo '<img src="assets/images/products/' . ($product['image'] ?: 'default.jpg') . '" 
+-                          alt="' . htmlspecialchars($product['name']) . '">';
++                          alt="' . htmlspecialchars($product['name']) . '" loading="lazy">';
+                     echo '</div>';
+                     echo '<div class="product-info">';
+                     echo '<h3>' . htmlspecialchars($product['name']) . '</h3>';
+
+--- admin/admin_complete.php
++++ admin/admin_complete.php
+@@ -616,8 +616,8 @@
+                     <td>
+                         <?php if (!empty($product['image'])): ?>
+-                            <img src="../assets/images/products/<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="product-image">
++                            <img src="../assets/images/products/<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="product-image" loading="lazy">
+                         <?php else: ?>
+-                            <img src="../assets/images/placeholder.png" alt="صورة افتراضية" class="product-image">
++                            <img src="../assets/images/placeholder.png" alt="صورة افتراضية للمنتج" class="product-image" loading="lazy">
+                         <?php endif; ?>
+                     </td>
+
+## Patch 5: Performance Optimization
+
+--- index.php
++++ index.php
+@@ -60,15 +60,15 @@
+                 try {
+                     $pdo = getConnection();
+-                    $stmt = $pdo->prepare("
+-                        SELECT p.*, c.name as category_name 
+-                        FROM products p 
+-                        LEFT JOIN categories c ON p.category_id = c.id 
+-                        WHERE p.featured = 1 AND p.status = 'active' 
+-                        ORDER BY p.created_at DESC 
+-                        LIMIT 8
+-                    ");
++                    // Optimized query with subquery for ratings
++                    $stmt = $pdo->prepare("
++                        SELECT p.*, c.name as category_name,
++                               (SELECT AVG(rating) FROM reviews WHERE product_id = p.id) as avg_rating,
++                               (SELECT COUNT(*) FROM reviews WHERE product_id = p.id) as review_count
++                        FROM products p 
++                        LEFT JOIN categories c ON p.category_id = c.id 
++                        WHERE p.featured = 1 AND p.status = 'active' 
++                        ORDER BY p.created_at DESC 
++                        LIMIT 8
++                    ");
+                     $stmt->execute();
+                     $featured_products = $stmt->fetchAll();
+
+## Patch 6: Error Handling Improvements
+
+--- php/functions.php
++++ php/functions.php
+@@ -25,15 +25,20 @@
+     try {
+         $stmt = $db->query('SELECT setting_key, setting_value FROM settings');
+         $settings = [];
+-        while ($row = $stmt->fetch()) {
+-            $settings[$row['setting_key']] = $row['setting_value'];
++        if ($stmt) {
++            while ($row = $stmt->fetch()) {
++                $settings[$row['setting_key']] = $row['setting_value'];
++            }
++        } else {
++            error_log('Failed to fetch settings from database');
+         }
+         return $settings;
+     } catch (Exception $e) {
+         error_log('خطأ في الحصول على الإعدادات: ' . $e->getMessage());
+         return [];
++    } finally {
++        $stmt = null;
+     }
+ }
+
+@@ -45,15 +50,20 @@
+         $sql .= ' ORDER BY created_at DESC LIMIT ?';
+         $params[] = $limit;
+         
+-        $stmt = $db->prepare($sql);
+-        $stmt->execute($params);
+-        return $stmt->fetchAll();
++        try {
++            $stmt = $db->prepare($sql);
++            $stmt->execute($params);
++            return $stmt->fetchAll();
++        } catch (PDOException $e) {
++            error_log('Database error in getProducts: ' . $e->getMessage());
++            return [];
++        } finally {
++            $stmt = null;
++        }
+     } catch (Exception $e) {
+         error_log('خطأ في الحصول على المنتجات: ' . $e->getMessage());
+         return [];
+     }
+ }
+
+## Patch 7: Constants Definition
+
+--- php/db.php
++++ php/db.php
+@@ -1,6 +1,15 @@
+ <?php
+ // ====== ملف الاتصال بقاعدة البيانات ======
+ 
++// Security and configuration constants
++define('MAX_LOGIN_ATTEMPTS', 5);
++define('LOGIN_TIMEOUT', 900); // 15 minutes
++define('SESSION_TIMEOUT', 3600); // 1 hour
++define('REMEMBER_TOKEN_EXPIRY', 30 * 24 * 60 * 60); // 30 days
++define('UPLOAD_MAX_SIZE', 5 * 1024 * 1024); // 5MB
++define('ALLOWED_IMAGE_TYPES', ['jpg', 'jpeg', 'png', 'gif', 'webp']);
++
+ // إعدادات قاعدة البيانات SQLite
+ define('DB_PATH', __DIR__ . '/../db/database.db');
+
+## Patch 8: File Upload Security Enhancement
+
+--- admin/settings.php
++++ admin/settings.php
+@@ -30,6 +30,25 @@
+     $message_type = '';
+ }
+ 
++// File upload validation function
++function validateFileUpload($file, $allowedTypes = ['jpg', 'jpeg', 'png', 'gif'], $maxSize = 5242880) {
++    $errors = [];
++    
++    if ($file['error'] !== UPLOAD_ERR_OK) {
++        $errors[] = 'خطأ في رفع الملف';
++        return $errors;
++    }
++    
++    if ($file['size'] > $maxSize) {
++        $errors[] = 'حجم الملف كبير جداً (الحد الأقصى 5MB)';
++    }
++    
++    $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
++    if (!in_array($fileExtension, $allowedTypes)) {
++        $errors[] = 'نوع الملف غير مسموح به';
++    }
++    
++    return $errors;
++}
++
+ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_logo'])) {
+     $logo_name = time() . '_' . basename($_FILES['site_logo']['name']);
+     
+-    // إنشاء المجلد إذا لم يكن موجوداً
+-    if (!is_dir('../assets/images')) mkdir('../assets/images', 0777, true);
++    // Validate file upload
++    $validationErrors = validateFileUpload($_FILES['site_logo']);
++    if (!empty($validationErrors)) {
++        $message = implode(', ', $validationErrors);
++        $message_type = 'error';
++    } else {
++        // إنشاء المجلد إذا لم يكن موجوداً
++        $upload_dir = realpath('../assets/images/');
++        if (!$upload_dir || !is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+     
+-    if (move_uploaded_file($_FILES['site_logo']['tmp_name'], '../assets/images/' . $logo_name)) {
+-        $current_settings['site_logo'] = $logo_name;
+-        $message = 'تم تحديث الشعار بنجاح';
+-        $message_type = 'success';
++        if (move_uploaded_file($_FILES['site_logo']['tmp_name'], $upload_dir . DIRECTORY_SEPARATOR . basename($logo_name))) {
++            $current_settings['site_logo'] = $logo_name;
++            $message = 'تم تحديث الشعار بنجاح';
++            $message_type = 'success';
+         } else {
+             $message = 'فشل في رفع الملف';
+             $message_type = 'error';
+         }
+     }
+ } 

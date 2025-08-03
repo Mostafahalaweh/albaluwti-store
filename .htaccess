@@ -1,0 +1,33 @@
+# ====== إعدادات Apache مبسطة ======
+
+# تفعيل mod_rewrite
+RewriteEngine On
+
+# إعدادات الأمان الأساسية
+<Files ~ "^\.ht">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# منع الوصول لملفات حساسة
+<FilesMatch "\.(log|sql|bak|tmp|env)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# إعدادات PHP
+<IfModule mod_php.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    php_value max_execution_time 300
+    php_value memory_limit 256M
+    php_flag display_errors On
+    php_flag log_errors On
+</IfModule>
+
+# صفحات الأخطاء
+ErrorDocument 404 /pages/404.php
+ErrorDocument 500 /pages/404.php
+ErrorDocument 403 /pages/404.php
+
+# ====== نهاية الملف ======

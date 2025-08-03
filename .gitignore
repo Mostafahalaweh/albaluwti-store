@@ -1,0 +1,182 @@
+# ====== ملف .gitignore لمتجر البلوطي ======
+
+# ملفات النظام
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ملفات IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ملفات PHP
+*.log
+*.tmp
+*.cache
+*.bak
+
+# ملفات قاعدة البيانات
+*.sql
+*.sqlite
+*.db
+
+# ملفات البيئة
+.env
+.env.local
+.env.production
+.env.staging
+
+# ملفات النسخ الاحتياطية
+backup/
+backups/
+*.tar.gz
+*.zip
+
+# ملفات الصور المؤقتة
+temp/
+tmp/
+uploads/temp/
+
+# ملفات السجلات
+logs/
+*.log
+
+# ملفات التكوين المحلية
+config/local.php
+config/database.local.php
+
+# ملفات الاختبار
+test/
+tests/
+*_test.php
+test_*.php
+
+# ملفات الإصلاح المؤقتة
+fix_*.php
+debug_*.php
+quick_*.php
+
+# ملفات Node.js (إذا تم استخدامها)
+node_modules/
+package-lock.json
+yarn.lock
+
+# ملفات Composer (إذا تم استخدامها)
+vendor/
+composer.lock
+
+# ملفات Git
+.git/
+.gitignore
+
+# ملفات Apache
+.htaccess.backup
+.htaccess.old
+
+# ملفات SSL
+*.pem
+*.key
+*.crt
+
+# ملفات التطوير
+dev/
+development/
+staging/
+
+# ملفات الإنتاج
+production/
+prod/
+
+# ملفات النسخ الاحتياطية التلقائية
+auto_backup/
+auto_backups/
+
+# ملفات الصور المؤقتة
+*.tmp.jpg
+*.tmp.png
+*.tmp.gif
+
+# ملفات التحميل المؤقتة
+temp_uploads/
+temp_files/
+
+# ملفات الجلسات
+sessions/
+session/
+
+# ملفات التخزين المؤقت
+cache/
+caches/
+
+# ملفات الأخطاء
+error_log
+error.log
+php_errors.log
+
+# ملفات الإعدادات المحلية
+local_config.php
+local_settings.php
+
+# ملفات الاختبارات
+test_results/
+coverage/
+
+# ملفات التوثيق المؤقتة
+docs/temp/
+docs/draft/
+
+# ملفات الترجمة المؤقتة
+languages/temp/
+translations/temp/
+
+# ملفات الإحصائيات
+stats/
+statistics/
+
+# ملفات التقارير
+reports/
+*.report
+
+# ملفات الأمان
+security/
+*.key
+*.pem
+*.crt
+
+# ملفات التطوير المحلية
+local/
+dev_local/
+
+# ملفات النسخ الاحتياطية للمستخدمين
+user_backups/
+user_data/
+
+# ملفات التطوير التجريبي
+experimental/
+beta/
+alpha/
+
+# ملفات التطوير المخصصة
+custom/
+customizations/
+
+# ملفات التطوير المؤقتة
+temp_dev/
+dev_temp/
+
+# ملفات التطوير المحلية
+local_dev/
+dev_local/
+
+# ملفات التطوير التجريبية
+experimental_dev/
+dev_experimental/
+
+# ملفات التطوير المخصصة
+custom_dev/
+dev_custom/
+
+# ====== نهاية الملف ====== 

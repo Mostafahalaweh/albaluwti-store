@@ -1,0 +1,96 @@
+# ====== ملف robots.txt لمتجر البلوطي (البيئة المحلية) ======
+
+# السماح لجميع محركات البحث
+User-agent: *
+
+# السماح بالوصول لجميع الصفحات العامة
+Allow: /
+
+# منع الوصول للمجلدات الحساسة
+Disallow: /admin/
+Disallow: /php/
+Disallow: /db/
+Disallow: /config/
+Disallow: /includes/
+Disallow: /assets/js/
+Disallow: /assets/css/
+
+# منع الوصول لملفات معينة
+Disallow: /*.log$
+Disallow: /*.sql$
+Disallow: /*.bak$
+Disallow: /*.tmp$
+Disallow: /.htaccess
+Disallow: /.env
+
+# منع الوصول لصفحات معينة
+Disallow: /login
+Disallow: /register
+Disallow: /checkout
+Disallow: /cart
+Disallow: /profile
+Disallow: /settings
+
+# منع الوصول لملفات API
+Disallow: /pages/api/
+Disallow: /pages/*_api.php
+
+# منع الوصول لملفات الإصلاح والاختبار
+Disallow: /fix_*.php
+Disallow: /test_*.php
+Disallow: /debug_*.php
+
+# إعدادات خاصة بـ Google
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /php/
+Disallow: /db/
+
+# إعدادات خاصة بـ Bing
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /php/
+Disallow: /db/
+
+# إعدادات خاصة بـ Yandex
+User-agent: Yandex
+Allow: /
+Disallow: /admin/
+Disallow: /php/
+Disallow: /db/
+
+# إعدادات خاصة بـ Baidu
+User-agent: Baiduspider
+Allow: /
+Disallow: /admin/
+Disallow: /php/
+Disallow: /db/
+
+# منع محركات البحث الضارة
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
+
+# إعدادات Sitemap (للموقع المحلي)
+Sitemap: http://localhost/albaluwti_backup/sitemap.xml
+
+# إعدادات Host (للموقع المحلي)
+Host: http://localhost
+
+# إعدادات Crawl-delay (اختياري)
+Crawl-delay: 1
+
+# ====== نهاية الملف ====== 
